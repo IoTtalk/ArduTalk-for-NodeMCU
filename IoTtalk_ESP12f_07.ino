@@ -2,7 +2,7 @@
  * IoTtalk V1 - ESP12F Version 7.0 
  */
 
-#define nODF 10   // The total number of ODFs which the DA will pull.
+#define nODF 10   // The max number of ODFs which the DA can pull.
  
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
