@@ -1,7 +1,7 @@
 //   IoTtalk V1 - ESP12F Version 8.0  
-#define nODF      10  // The max number of ODFs which the DA can pull.
 #define DM_name  "ESP12F" 
 #define DF_list  {"esp12f_LED", "GPIO16", "Sensor"}
+#define nODF      10  // The max number of ODFs which the DA can pull.
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
