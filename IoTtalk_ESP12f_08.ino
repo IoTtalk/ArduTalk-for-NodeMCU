@@ -16,13 +16,15 @@ char IoTtalkServerIP[100] = "";
 void clr_eeprom(int sw=0){
     if (!sw){
         Serial.println("Count down 3 seconds to clear EEPROM.");
+        digitalWrite(2,LOW);
         delay(3000);
     }
     if( (digitalRead(5) == LOW) || (sw == 1) ){
         for(int addr=0; addr<50; addr++) EEPROM.write(addr,0);   // clear eeprom
         EEPROM.commit();
-        Serial.println("Clear EEPROM.");
+        Serial.println("Clear EEPROM  and reboot.");
         digitalWrite(2,HIGH);
+        ESP.reset();
     }
 }
 
@@ -332,10 +334,7 @@ long cycleTimestamp = millis();
 int LED_flag=0;
 String result;
 void loop() {
-    if (digitalRead(5) == LOW){
-        clr_eeprom();
-        LED_flag = 3;
-    }
+    if (digitalRead(5) == LOW) clr_eeprom();
  
     if (millis() - cycleTimestamp > 500) {
         result = pull("esp12f_LED");
@@ -352,7 +351,7 @@ void loop() {
           else if(result.toInt() == 0) digitalWrite(16,LOW);          
         }
 
-        push("Sensor", String(millis()));        
+        push("Sensor", String(analogRead(A0)));        
 
         LED_flag = LED_flag^1;
         digitalWrite(2, LED_flag);    
