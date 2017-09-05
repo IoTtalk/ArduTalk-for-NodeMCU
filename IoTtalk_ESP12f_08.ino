@@ -1,4 +1,4 @@
-//   IoTtalk V1 - ESP12F Version 8.1
+//   IoTtalk V1 - ESP12F Version 8.2
 #define DM_name  "ESP12F" 
 #define DF_list  {"esp12f_LED", "GPIO16", "Sensor"}
 #define nODF     10  // The max number of ODFs which the DA can pull.
