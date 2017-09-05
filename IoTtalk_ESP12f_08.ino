@@ -231,8 +231,8 @@ int iottalk_register(void){
 String df_name_list[nODF];
 String df_timestamp[nODF];
 void init_ODFtimestamp(){
-  for (int i=0; i<=nODF; i++) df_timestamp[i] == "";
-  for (int i=0; i<=nODF; i++) df_name_list[i] == "";  
+  for (int i=0; i<=nODF; i++) df_timestamp[i] = "";
+  for (int i=0; i<=nODF; i++) df_name_list[i] = "";  
 }
 
 int DFindex(char *df_name){
