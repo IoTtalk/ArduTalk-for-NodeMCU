@@ -1,4 +1,4 @@
-//   IoTtalk V1 - ESP12F Version 8.0  
+//   IoTtalk V1 - ESP12F Version 8.1
 #define DM_name  "ESP12F" 
 #define DF_list  {"esp12f_LED", "GPIO16", "Sensor"}
 #define nODF     10  // The max number of ODFs which the DA can pull.
@@ -9,6 +9,7 @@
 #include <ESP8266WiFiMulti.h>
 #include "ESP8266HTTPClient2.h"
 #include <EEPROM.h>
+#include <ArduinoJson.h>
 //#include <ESP8266mDNS.h>   //enable Multicast DNS to provide Bonjour service.
 char IoTtalkServerIP[100] = "";
 
@@ -261,44 +262,35 @@ int push(char *df_name, String value){
 }
 
 String pull(char *df_name){
-    http.begin( url + String(df_name) );
-    http.addHeader("Content-Type","application/json");
-    int httpCode = http.GET(); //http state code
-    if (httpCode != 200) Serial.println("[HTTP] PULL \"" + String(df_name) + "\"... code: " + (String)httpCode + ", retry to register.");
-    while (httpCode != 200){
-        digitalWrite(2, HIGH);
-        httpCode = iottalk_register();
-        if (httpCode == 200) http.GET();
-        else delay(3000);
-    }
-    String get_ret_str = http.getString();  //After send GET request , store the return string
-    //Serial.println(get_ret_str);
-    http.end();
+  DynamicJsonBuffer jsonBuffer;
 
-    int string_index = 0;
-    string_index = get_ret_str.indexOf("[",string_index);
-    String portion = "";  //This portion is used to fetch the timestamp.
-    if (get_ret_str[string_index+1] == '[' &&  get_ret_str[string_index+2] == '\"'){
-        string_index += 3;
-        while (get_ret_str[string_index] != '\"'){
-          portion += get_ret_str[string_index];
-          string_index+=1;
-        }
-        
-        if (df_timestamp[DFindex(df_name)] != portion){
-            df_timestamp[DFindex(df_name)] = portion;
-            string_index = get_ret_str.indexOf("[",string_index);
-            string_index += 1;
-            portion = ""; //This portion is used to fetch the data.
-            while (get_ret_str[string_index] != ']'){
-                portion += get_ret_str[string_index];
-                string_index+=1;
-            }
-            return portion;   // return the data.
-         }
-         else return "___NULL_DATA___";
-    }
-    else return "___NULL_DATA___";
+  http.begin( url + String(df_name) );
+  http.addHeader("Content-Type","application/json");
+  int httpCode = http.GET(); //http state code
+  if (httpCode != 200) Serial.println("[HTTP] PULL \"" + String(df_name) + "\"... code: " + (String)httpCode + ", retry to register.");
+  while (httpCode != 200){
+      digitalWrite(2, HIGH);
+      httpCode = iottalk_register();
+      if (httpCode == 200) http.GET();
+      else delay(3000);
+  }
+  String get_ret_str = http.getString();  //After send GET request , store the return string
+  JsonObject& root = jsonBuffer.parseObject(get_ret_str);
+  //Serial.println(get_ret_str);
+  http.end();
+
+  String portion = "";  //This portion is used to fetch the timestamp.
+  if (get_ret_str.indexOf("samples") >=0){ // if not found the string , it will return -1
+      portion = root["samples"][0][0].as<String>();
+      
+      if (df_timestamp[DFindex(df_name)] != portion){
+          df_timestamp[DFindex(df_name)] = portion;
+          portion = root["samples"][0][1].as<String>();
+          return portion;   // return the data.
+       }
+       else return "___NULL_DATA___";
+  }
+  else return "___NULL_DATA___";
 }
 
 
