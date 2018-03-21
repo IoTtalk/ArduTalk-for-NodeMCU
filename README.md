@@ -1,8 +1,8 @@
 # ArduTalk for NodeMCU
 
-
 Implement ArduTalk on NodeMCU (ESP12E).
 
+Device Model: "NodeMCU"
 
 The available device features are listed as follows:
 
