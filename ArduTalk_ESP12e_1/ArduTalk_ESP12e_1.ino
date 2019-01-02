@@ -5,7 +5,7 @@
 #define nODF     10  // The max number of ODFs which the DA can pull.
 
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
+//#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFiMulti.h>
 #include "ESP8266HTTPClient2.h"
@@ -292,6 +292,7 @@ int push(char *df_name, String value){
 
 String pull(char *df_name){
     http.begin( url + String(df_name) );
+   Serial.println(url + String(df_name));
     http.addHeader("Content-Type","application/json");
     int httpCode = http.GET(); //http state code
     
