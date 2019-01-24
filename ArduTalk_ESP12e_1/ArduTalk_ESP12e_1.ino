@@ -5,7 +5,7 @@
 #define nODF     10  // The max number of ODFs which the DA can pull.
 
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
+//#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFiMulti.h>
 #include "ESP8266HTTPClient2.h"
@@ -14,8 +14,15 @@
 char IoTtalkServerIP[100] = "";
 String result;
 String url = "";
+String passwordkey ="";
 HTTPClient http;
 
+String remove_ws(const String& str )
+{
+    String str_no_ws ;
+    for( char c : str ) if( !std::isspace(c) ) str_no_ws += c ;
+    return str_no_ws ;
+}
 
 void clr_eeprom(int sw=0){
     if (!sw){
@@ -278,15 +285,18 @@ int push(char *df_name, String value){
            // if (switchState) digitalWrite(4,HIGH);
         }
         else delay(3000);
-    }    
+    }
+    http.end();
     return httpCode;
 }
 
 String pull(char *df_name){
     http.begin( url + String(df_name) );
+   Serial.println(url + String(df_name));
     http.addHeader("Content-Type","application/json");
     int httpCode = http.GET(); //http state code
-    if (httpCode != 200) Serial.println("[HTTP] PULL \"" + String(df_name) + "\"... code: " + (String)httpCode + ", retry to register.");
+    
+    if (httpCode != 200) Serial.println("[HTTP] "+url + String(df_name)+" PULL \"" + String(df_name) + "\"... code: " + (String)httpCode + ", retry to register.");
     while (httpCode != 200){
         digitalWrite(4, LOW);
         digitalWrite(2, HIGH);
@@ -298,9 +308,12 @@ String pull(char *df_name){
         else delay(3000);
     }
     String get_ret_str = http.getString();  //After send GET request , store the return string
-    //Serial.println(get_ret_str);
+//    Serial.println
+    
+    Serial.println("output "+String(df_name)+": \n"+get_ret_str);
     http.end();
 
+    get_ret_str = remove_ws(get_ret_str);
     int string_index = 0;
     string_index = get_ret_str.indexOf("[",string_index);
     String portion = "";  //This portion is used to fetch the timestamp.
@@ -455,4 +468,3 @@ void loop() {
 
     if (millis()-LEDonCycle > 1) digitalWrite(2, 1);
 }
-
