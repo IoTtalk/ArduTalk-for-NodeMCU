@@ -88,7 +88,7 @@ int read_netInfo(char *wifiSSID, char *wifiPASS, char *ServerIP){   // storage f
 String scan_network(void){
     int AP_N,i;  //AP_N: AP number 
     String AP_List="<select name=\"SSID\" style=\"width: 150px; font-size:16px; color:blue; \" required>" ;// make ap_name in a string
-    AP_List += "<option value=\"\" disabled selected>隢���</option>";
+    AP_List += "<option value=\"\" disabled selected>Select AP</option>";
   
     WiFi.disconnect();
     delay(100);
